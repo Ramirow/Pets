@@ -3,9 +3,10 @@ const bodyParser = require("body-parser");
 const url = 'mongodb://localhost:27017/MyDb';
 const app = express();
 const hostname = 'localhost';
-const port = 3000
+const port = 8000
 const mongo = require('mongodb');
 const path = require('path');
+var cors = require('cors');
 var MongoClient = require('mongodb').MongoClient;
 // const { assert } = require("console");
 // const { json } = require("body-parser");
@@ -23,6 +24,8 @@ server.listen(port, hostname, () => {
 // Body-parser middleware
 app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.json())  
+
+app.use(cors());
 
 
 app.get('/about', function(req, res) {
@@ -60,6 +63,22 @@ app.post('/pets',(req,res) => {
      }) 
     })
 })
+
+app.put('/pets',(req,res) => {
+ MongoClient.connect(url,function(err,db){
+ var myquery = { id: req.body.id };
+ var newvalues = { $set: {name : req.body.name,age : req.body.age }};
+ db.collection("pets").updateOne(myquery, newvalues, function(err, result) {
+  if (err) throw err;
+  console.log("1 document updated");
+  res.json(result)
+  db.close();
+ 
+})
+})
+})
+
+
   
 
 
